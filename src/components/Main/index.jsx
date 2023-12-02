@@ -1,24 +1,13 @@
-import { useState } from "react";
 import Avatar from "../Avatar";
 import ItemRepositorio from "../ItemRespositorio";
 import Repositorios from "../Repositorios";
 import styles from "./styles.module.scss";
+import reposCollection from "../../hooks/reposCollection";
+import LikeButton from "../LikeButton";
 
 export default function Main(){
 
-    const [user,setUser] = useState("");
-    const [currentUser, setCurrentUser] = useState(null);
-    const [repos, setRepos] = useState([]);
-
-
-    const handleGetData = async ()=>{
-        const userData = await fetch(`https://api.github.com/users/${user}`)
-        const newUser = await userData.json();
-        const userRepos = await fetch(newUser.repos_url);
-        const repositorios = await userRepos.json();
-        setRepos(repositorios)
-        setCurrentUser(newUser)
-    }
+    const {removerRepositorio, repos, currentUser, handleGetData, user, setUser} = reposCollection();
 
     return(
         <>
@@ -43,17 +32,21 @@ export default function Main(){
                         
 
                             <Repositorios>
-                                {repos.map(rep=>(
+                                {repos.map((rep)=>(
                                 <ItemRepositorio
                                 key={rep.id}
+                                id={rep.id}
                                 url={rep.html_url} 
                                 nameProject={rep.name} 
                                 descProject={rep.description} 
                                 languages={rep.language?rep.language:"MarkDown"}
-                                />))}
-                        </Repositorios>
+                                >
+                                    <LikeButton id={rep.id}
+                                    handleClick={()=>removerRepositorio(rep)}
+                                    btnValue="Remover"/>
+                                </ItemRepositorio>))}
+                            </Repositorios>
                     </>:null}
-                    
                 </div>
             </main>
         </>
